@@ -656,6 +656,21 @@ async function main() {
     await dbInsert("daily_rollup", rollupPayload);
     console.log("✅ daily_rollup baru berhasil dibuat.");
   }
+
+  // Record into crawl_jobs table
+  try {
+    await dbInsert("crawl_jobs", {
+      org_id: DENPASAR_ORG_ID,
+      platform: "multi-platform",
+      status: "completed",
+      posts_ingested: totalNewPosts,
+      comments_ingested: totalNewComments,
+      executed_at: new Date().toISOString(),
+    });
+    console.log("✅ Riwayat eksekusi sinkronisasi berhasil dicatat di crawl_jobs.");
+  } catch (err: any) {
+    console.error("Gagal mencatat crawl_jobs:", err.message);
+  }
 }
 
 main().catch((err) => {
