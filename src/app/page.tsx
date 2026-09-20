@@ -93,15 +93,18 @@ export default function MediaAnalitikDashboard() {
   // PDF report preview modal
   const [showPdfModal, setShowPdfModal] = useState(false);
 
+  const [crawlStatus, setCrawlStatus] = useState<any>(null);
+
   // Fetch initial data
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [ovRes, topRes, feedRes, profRes] = await Promise.all([
+      const [ovRes, topRes, feedRes, profRes, crawlStatusRes] = await Promise.all([
         fetch("/api/analytics/overview?days=30"),
         fetch("/api/analytics/topics"),
         fetch("/api/analytics/feed?limit=50"),
         fetch("/api/profile"),
+        fetch("/api/crawl/status"),
       ]);
 
       if (ovRes.ok) {
@@ -119,6 +122,10 @@ export default function MediaAnalitikDashboard() {
       if (profRes.ok) {
         const profJson = await profRes.json();
         setProfileData(profJson.data);
+      }
+      if (crawlStatusRes.ok) {
+        const crawlJson = await crawlStatusRes.json();
+        setCrawlStatus(crawlJson.data);
       }
     } catch (err) {
       console.error("Error fetching data:", err);
@@ -407,8 +414,20 @@ export default function MediaAnalitikDashboard() {
               </div>
               <p className="text-xs text-slate-400 flex items-center gap-1.5 mt-0.5">
                 <Database className="w-3.5 h-3.5 text-emerald-400 inline" />
-                Insforge PostgreSQL · RLS Multi-Tenant Aktif · IndoBERT + DeepSeek
+                Insforge PostgreSQL · RLS Multi-Tenant Aktif · DeepSeek-v4
               </p>
+              <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                <span className="inline-flex items-center gap-1 bg-emerald-950/70 text-emerald-400 text-[11px] px-2 py-0.5 rounded-full border border-emerald-800/60 font-medium">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  Auto-Sync: Tiap 3 Jam
+                </span>
+                {crawlStatus?.lastJob?.executedAt && (
+                  <span className="text-[11px] text-slate-400">
+                    Terakhir: {new Date(crawlStatus.lastJob.executedAt).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}
+                    {crawlStatus.lastJob.postsIngested > 0 ? ` (+${crawlStatus.lastJob.postsIngested} baru)` : " (Up-to-date)"}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 
@@ -417,9 +436,10 @@ export default function MediaAnalitikDashboard() {
               onClick={triggerCrawlPipeline}
               disabled={refreshing}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded-lg shadow transition disabled:opacity-50"
+              title="Jadwal otomatis berjalan setiap 3 jam. Klik untuk sinkronisasi seketika."
             >
               <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? "animate-spin" : ""}`} />
-              {refreshing ? "Memproses ETL..." : "Crawl & Analisis Baru"}
+              {refreshing ? "Sinkronisasi..." : "Sinkronkan Sekarang"}
             </button>
             <button
               onClick={() => {
