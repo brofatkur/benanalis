@@ -204,6 +204,8 @@ export async function escalateToDeepSeek(
   profile: PerspectiveProfile
 ): Promise<SentimentAnalysisResult> {
   const apiKey = process.env.DEEPSEEK_API_KEY;
+  const baseUrl = process.env.DEEPSEEK_BASE_URL || "https://ai.sumopod.com/v1";
+  const model = process.env.DEEPSEEK_MODEL || "deepseek-v4-flash-0731:netra";
 
   // If DeepSeek API key is not configured, apply an intelligent heuristic rule evaluator with perspective context
   if (!apiKey) {
@@ -228,28 +230,29 @@ Output WAJIB berupa format JSON murni:
   "reasoning": "penjelasan singkat sudut pandang institusi"
 }`;
 
-    const res = await fetch("https://api.deepseek.com/v1/chat/completions", {
+    const res = await fetch(`${baseUrl}/chat/completions`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "deepseek-chat",
+        model: model,
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: `Analisis teks berikut:\n"${text}"` },
         ],
         temperature: 0.1,
-        response_format: { type: "json_object" },
       }),
     });
 
     if (res.ok) {
       const data = await res.json();
-      const parsed = JSON.parse(data.choices[0].message.content);
+      let rawContent = data.choices[0]?.message?.content || "{}";
+      rawContent = rawContent.replace(/```json/gi, "").replace(/```/g, "").trim();
+      const parsed = JSON.parse(rawContent);
       return {
-        label: parsed.label,
+        label: parsed.label || "netral",
         score: Number(parsed.score) || 0.88,
         model_used: "deepseek-v3",
         profile_version_id: profile.profile_version,

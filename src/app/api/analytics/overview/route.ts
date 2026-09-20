@@ -7,12 +7,13 @@ export async function GET(request: Request) {
     const orgId = searchParams.get("org_id") || "11111111-1111-1111-1111-111111111111";
     const days = parseInt(searchParams.get("days") || "30", 10);
 
-    // 1. Fetch daily_rollup for requested period
-    const rollups = await dbSelect("daily_rollup", {
+    // 1. Fetch daily_rollup for requested period (latest first, then reversed for chronological view)
+    const rawRollups = await dbSelect("daily_rollup", {
       filters: { org_id: `eq.${orgId}` },
-      order: "rollup_date.asc",
+      order: "rollup_date.desc",
       limit: days,
     });
+    const rollups = (rawRollups || []).reverse();
 
     // 2. Fetch raw_posts for platform distribution
     const posts = await dbSelect("raw_posts", {
@@ -58,15 +59,15 @@ export async function GET(request: Request) {
 
     // Platform breakdown
     const platformCounts: Record<string, number> = {
-      instagram: 0,
       tiktok: 0,
+      instagram: 0,
       twitter: 0,
       facebook: 0,
+      news: 0,
     };
     for (const p of posts) {
-      if (platformCounts[p.platform] !== undefined) {
-        platformCounts[p.platform]++;
-      }
+      const plat = (p.platform || "other").toLowerCase();
+      platformCounts[plat] = (platformCounts[plat] || 0) + 1;
     }
 
     // Anomaly status from anomaly_logs

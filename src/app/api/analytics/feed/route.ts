@@ -25,16 +25,16 @@ export async function GET(request: Request) {
       dbSelect("raw_posts", {
         filters: postFilters,
         order: "posted_at.desc",
-        limit: 60,
+        limit: 200,
       }),
       dbSelect("raw_comments", {
         filters: commentFilters,
         order: "posted_at.desc",
-        limit: 100,
+        limit: 500,
       }),
       dbSelect("sentiment_scores", {
         filters: { org_id: `eq.${orgId}` },
-        limit: 500,
+        limit: 2000,
       }),
     ]);
 
