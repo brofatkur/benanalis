@@ -1,0 +1,420 @@
+---
+name: socialcrawl
+description: >
+  Interact with the SocialCrawl API — a unified social, commerce, and research
+  data API covering 65 platforms and 575 endpoints, plus cross-platform Prism
+  composites, scheduled Monitors, and audience-filtered Cohorts. Fetch
+  profiles, posts, comments, search results, transcripts, ad libraries, retail
+  and marketplace product catalogs and reviews, app-store listings and reviews,
+  places and local businesses, job listings and salary bands, market quotes and
+  financial statements, congressional trading disclosures, prediction markets,
+  news, Google and Naver trends, on-page SEO audits, web scraping/crawling/
+  browser agents, AI-grounded answers, and a universal cross-platform search
+  from TikTok, Instagram, YouTube, Twitter/X, Facebook, LinkedIn, Reddit,
+  Threads, Douyin, Telegram, Quora, Amazon, Walmart, Target, eBay, Home Depot,
+  Klarna, AliExpress, Etsy, Sephora, H&M, Kohl's, Wayfair, Gumtree, Google
+  Play, the App Store, Trustpilot, G2, Tripadvisor, Yelp, GitHub, Naver, and
+  many more through a single API. Use when the user wants to: (1) fetch social
+  media, commerce, retail, app-store, review, jobs, or finance data,
+  (2) generate code that calls the SocialCrawl API, (3) understand SocialCrawl
+  endpoints, parameters, pricing, or capabilities, (4) check their SocialCrawl
+  credit balance or work out what a job will cost, (5) run a universal search
+  across many sources with one call, (6) run a cross-platform Prism composite
+  or schedule a Monitor, (7) scrape, crawl, or monitor an arbitrary web page,
+  (8) find out which of a specific list of public accounts posted about
+  something (Cohorts), or mentions "SocialCrawl", "social crawl", or
+  "social media API".
+---
+
+# SocialCrawl API
+
+Unified social media, commerce, and research data API. One API key, one response format, **65 platforms, 575 endpoints** — plus cross-platform **Prism** composites, stateful scheduled **Monitors**, and audience-filtered **Cohorts**. Author and Post responses are normalized through platform field maps and augmented with computed fields (`engagement_rate`, `language`, `content_category`, `estimated_reach`) under `data.computed`. Commerce, review, place, and app endpoints share first-class canonical Product / Review / Seller / Place / App schemas. List responses are always `{ items, next_cursor?, total? }`. Add `?format=raw` to bypass the transform pipeline.
+
+## API Key
+
+Resolve the API key only when a live API call is needed. Documentation, capability, pricing, and code-generation questions do not need a key.
+
+Check these sources in order without displaying their contents:
+
+1. **Environment variable:** use `SOCIALCRAWL_API_KEY` when it starts with `sc_` and is not an example placeholder.
+2. **Config file:** if the environment variable is absent, load `~/.config/socialcrawl/api_key` into `SOCIALCRAWL_API_KEY` in the current process. On POSIX shells, use `SOCIALCRAWL_API_KEY="$(<"$HOME/.config/socialcrawl/api_key")"; export SOCIALCRAWL_API_KEY`. On PowerShell, use `$env:SOCIALCRAWL_API_KEY = (Get-Content -LiteralPath "$HOME/.config/socialcrawl/api_key" -Raw).Trim()`.
+3. **Missing key:** tell the user to create or rotate a key at https://socialcrawl.dev/dashboard and configure it as `SOCIALCRAWL_API_KEY` or in `~/.config/socialcrawl/api_key`. Do not ask them to paste a secret into chat. Stop before the live call until they say it is configured.
+
+Never print, paste, log, or return the key. Never place a literal key in generated code, a command, a URL, an error message, or a saved transcript. Keep `$SOCIALCRAWL_API_KEY` (POSIX) or `$env:SOCIALCRAWL_API_KEY` (PowerShell) as a variable reference in examples. If the key appeared in chat or output, advise the user to revoke it in the dashboard and create a replacement.
+
+## First Live Call
+
+Before the first live call in a session:
+
+1. Resolve the API key using the steps above. If it is missing or a placeholder, stop before making the call.
+2. Verify it with the free balance endpoint (0 credits):
+   ```bash
+   curl -s -H "x-api-key: $SOCIALCRAWL_API_KEY" "https://www.socialcrawl.dev/v1/credits/balance"
+   ```
+3. If successful, show the balance and continue with the user's request.
+4. If it fails, report the error without including request headers or the key, then follow Error Handling below.
+
+## Freshness Check (do this once per session)
+
+This file is a snapshot of the API taken when it was published. The API keeps
+shipping. Confirm the snapshot still matches before you trust its tables, with
+one free call alongside the balance check:
+
+```bash
+curl -s -H "x-api-key: $SOCIALCRAWL_API_KEY" "https://www.socialcrawl.dev/v1/utility/endpoints" | head -c 400
+```
+
+Compare `data.stats.platforms` and `data.stats.endpoints` against the
+**65 platforms, 575 endpoints** this file was built from.
+
+- **They match** - the tables below are current. Use them and move on.
+- **The live numbers are HIGHER** - this copy is behind. The API has platforms
+  and endpoints this file does not list. For the rest of the session treat the
+  live registry as the source of truth and resolve anything the tables cannot
+  answer through `/v1/utility/*` (all free, see below). Mention it to the user
+  **once**, briefly, then carry on answering their actual question:
+  > Heads up: this SocialCrawl skill is behind the live API (it lists X
+  > platforms, the API now has Y). I'm reading the live registry so answers
+  > stay correct. Run `npx skills update socialcrawl --yes` to refresh it.
+
+  (X is this file's number, Y is `data.stats.platforms` from the response.)
+
+  Do not repeat the notice, do not block on it, and do not ask permission to
+  continue. Never let a stale table become a wrong answer.
+- **The call fails** (no key yet, offline, non-200) - skip it silently and use
+  the tables. This check must never block the user's request.
+
+## Platforms
+
+<!-- BEGIN:GENERATED:PLATFORMS (auto-generated by generate-docs.ts - AIP-16b) -->
+**Social media:**
+
+| Platform | Endpoints | Methods | Reference |
+|----------|-----------|---------|-----------|
+| TikTok | 36 | GET | [references/tiktok.md](references/tiktok.md) |
+| TikTok Shop | 5 | GET | [references/tiktokshop.md](references/tiktokshop.md) |
+| Instagram | 37 | GET | [references/instagram.md](references/instagram.md) |
+| YouTube | 29 | GET/POST | [references/youtube.md](references/youtube.md) |
+| Facebook | 24 | GET | [references/facebook.md](references/facebook.md) |
+| Twitter/X | 15 | GET | [references/twitter.md](references/twitter.md) |
+| LinkedIn | 45 | GET | [references/linkedin.md](references/linkedin.md) |
+| Reddit | 14 | GET | [references/reddit.md](references/reddit.md) |
+| Threads | 6 | GET | [references/threads.md](references/threads.md) |
+| Pinterest | 5 | GET | [references/pinterest.md](references/pinterest.md) |
+| Bluesky | 3 | GET | [references/bluesky.md](references/bluesky.md) |
+| Spotify | 6 | GET | [references/spotify.md](references/spotify.md) |
+| Rumble | 5 | GET | [references/rumble.md](references/rumble.md) |
+| Kwai | 3 | GET | [references/kwai.md](references/kwai.md) |
+| Truth Social | 3 | GET | [references/truthsocial.md](references/truthsocial.md) |
+| Twitch | 4 | GET | [references/twitch.md](references/twitch.md) |
+| Snapchat | 2 | GET | [references/snapchat.md](references/snapchat.md) |
+| Kick | 1 | GET | [references/kick.md](references/kick.md) |
+| Douyin (Chinese TikTok, mostly metered) | 8 | GET | [references/douyin.md](references/douyin.md) |
+| Telegram (public channels) | 3 | GET | [references/telegram.md](references/telegram.md) |
+| Quora (questions, answers, spaces) | 7 | GET | [references/quora.md](references/quora.md) |
+| Apple Music (artists, albums, tracks) | 4 | GET | [references/apple_music.md](references/apple_music.md) |
+
+**Commerce, retail & marketplaces:**
+
+| Platform | Endpoints | Methods | Reference |
+|----------|-----------|---------|-----------|
+| Amazon (products, reviews, sellers) | 8 | GET | [references/amazon.md](references/amazon.md) |
+| Walmart (products, reviews, offers, categories) | 5 | GET | [references/walmart.md](references/walmart.md) |
+| Target (products, reviews, categories, stores) | 5 | GET | [references/target.md](references/target.md) |
+| eBay (product + search, incl. sold listings) | 2 | GET | [references/ebay.md](references/ebay.md) |
+| Home Depot (search, product, reviews, stores) | 4 | GET | [references/home_depot.md](references/home_depot.md) |
+| Google Shopping | 5 | GET | [references/google_shopping.md](references/google_shopping.md) |
+| Klarna (products, merchant offers, price history, reviews) | 18 | GET | [references/klarna.md](references/klarna.md) |
+| AliExpress (products, search, reviews, shipping, promos) | 9 | GET | [references/aliexpress.md](references/aliexpress.md) |
+| Etsy (listings, shop catalog, similar items) | 4 | GET | [references/etsy.md](references/etsy.md) |
+| Sephora (products, reviews, brands, stores, availability) | 11 | GET | [references/sephora.md](references/sephora.md) |
+| H&M (search, stores, categories, supplier disclosure) | 6 | GET | [references/hm.md](references/hm.md) |
+| Kohl's (search, reviews, Q&A, stores) | 5 | GET | [references/kohls.md](references/kohls.md) |
+| Wayfair (search, product, reviews) | 3 | GET | [references/wayfair.md](references/wayfair.md) |
+| Gumtree (UK classifieds: listings, sellers, locations) | 11 | GET | [references/gumtree.md](references/gumtree.md) |
+
+**Reviews, places & reputation:**
+
+| Platform | Endpoints | Methods | Reference |
+|----------|-----------|---------|-----------|
+| Trustpilot | 2 | GET | [references/trustpilot.md](references/trustpilot.md) |
+| G2 (software products + reviews) | 7 | GET | [references/g2.md](references/g2.md) |
+| Tripadvisor | 16 | GET | [references/tripadvisor.md](references/tripadvisor.md) |
+| Yelp (businesses, reviews, search) | 5 | GET | [references/yelp.md](references/yelp.md) |
+
+**Search, places, news & finance:**
+
+| Platform | Endpoints | Methods | Reference |
+|----------|-----------|---------|-----------|
+| Google (SERP, ads, Business, hotels) | 10 | GET | [references/google.md](references/google.md) |
+| Google News (news SERP search) | 1 | GET | [references/google_news.md](references/google_news.md) |
+| Finance (quotes, history, statements, options, news) | 7 | GET | [references/finance.md](references/finance.md) |
+| Google Trends (trending now, interest over time, rising) | 3 | GET | [references/google_trends.md](references/google_trends.md) |
+| Naver (Korean search corpora, Data Lab trends, brief) | 14 | GET | [references/naver.md](references/naver.md) |
+
+**App stores:**
+
+| Platform | Endpoints | Methods | Reference |
+|----------|-----------|---------|-----------|
+| Google Play | 9 | GET | [references/google_play.md](references/google_play.md) |
+| Apple App Store | 9 | GET | [references/app_store.md](references/app_store.md) |
+
+**Research, dev & data:**
+
+| Platform | Endpoints | Methods | Reference |
+|----------|-----------|---------|-----------|
+| GitHub | 12 | GET | [references/github.md](references/github.md) |
+| Hacker News | 4 | GET | [references/hackernews.md](references/hackernews.md) |
+| Tavily (web search/extract/crawl) | 4 | GET | [references/tavily.md](references/tavily.md) |
+| Perplexity (AI research) | 1 | GET | [references/perplexity.md](references/perplexity.md) |
+| Polymarket (prediction markets) | 1 | GET | [references/polymarket.md](references/polymarket.md) |
+| Content Analysis (brand mentions + sentiment) | 10 | GET | [references/content_analysis.md](references/content_analysis.md) |
+| Jobs (LinkedIn/Indeed/Bing/Xing listings + salaries) | 11 | GET | [references/jobs.md](references/jobs.md) |
+| US Congress Trades (STOCK Act disclosures + statistics) | 19 | GET | [references/us_congress_trades.md](references/us_congress_trades.md) |
+| On-Page (single-URL SEO audit) | 1 | GET | [references/on_page.md](references/on_page.md) |
+| Web Scraping (scrape, search, crawl, map, agent, sessions) | 22 | GET/POST/PATCH/DELETE | [references/web.md](references/web.md) |
+| Universal Search (all platforms at once) | 4 | GET | [references/search.md](references/search.md) |
+
+**Link-in-bio:**
+
+| Platform | Endpoints | Methods | Reference |
+|----------|-----------|---------|-----------|
+| Linktree | 1 | GET | [references/linktree.md](references/linktree.md) |
+| LinkBio | 1 | GET | [references/linkbio.md](references/linkbio.md) |
+| LinkMe | 1 | GET | [references/linkme.md](references/linkme.md) |
+| Komi | 1 | GET | [references/komi.md](references/komi.md) |
+| Pillar | 1 | GET | [references/pillar.md](references/pillar.md) |
+
+**Composites, stateful surfaces & meta:**
+
+| Surface | Endpoints | Methods | Reference |
+|----------|-----------|---------|-----------|
+| Prism (cross-platform composites) | 33 | GET/POST | [references/prism.md](references/prism.md) |
+| Utility (free API self-discovery) | 4 | GET | [references/utility.md](references/utility.md) |
+| Monitors (scheduled recipes + webhooks) | - | GET/POST/PUT/PATCH/DELETE | [references/monitors.md](references/monitors.md) |
+| Cohorts (audience-filtered mention search) | - | GET/POST/PUT/PATCH/DELETE | [references/cohorts.md](references/cohorts.md) |
+
+Prism endpoints (`/v1/prism/*`) fan out across many platforms and fold the legs into one report (URL lookup, comment harvesting, reputation, share-of-voice, AI consensus answers, crisis radar, creator vetting, video/app/product intelligence). A few composites keep their platform's own path (e.g. `{platform}/profile/full`, `reddit/omni-search`) and are documented in that platform's reference. Monitors (`/v1/monitors/*`) re-run any recipe on a cadence and deliver each result to a signed webhook. Cohorts (`/v1/cohorts/*` + `/v1/cohort-queries/*`) invert social listening: you upload a panel of public identities and ask which of *them* posted your keywords. Both are stateful resource families, **not** registry endpoints, so neither is part of the 575 count, and they use POST/PUT/PATCH/DELETE in addition to GET.
+
+**Withdrawn platforms:** SoundCloud is registered but soft-disabled - every endpoint returns `503 SERVICE_UNAVAILABLE` and never bills, pending a re-source. Say withdrawn, not unsupported.
+<!-- END:GENERATED:PLATFORMS -->
+
+> **Never answer "not supported" from this table alone.** The table is only as
+> new as this file, and a missing row is far more often a stale copy than a
+> real gap. Before telling a user a platform, endpoint or capability does not
+> exist, check the live registry - it is free, so a check costs nothing and a
+> wrong "no" costs a customer:
+>
+> ```bash
+> curl -s -H "x-api-key: $SOCIALCRAWL_API_KEY" \
+>   "https://www.socialcrawl.dev/v1/utility/endpoints?search=douyin"
+> ```
+>
+> Each row comes back with everything needed to make the call without this
+> file: `path`, `method`, `credits_label` (the full pricing rule, including
+> metered ranges), `required_params`, `one_of`, `optional_params`, `paginated`
+> and `cache_ttl_seconds`. Only say it is unsupported when that search returns
+> `total: 0`.
+
+## Workflow
+
+Determine what the user wants, then follow the matching workflow:
+
+**User wants data:**
+1. Identify the platform and resource from their request
+2. Read the platform's reference file from the table above. Each endpoint section carries its exact cost, cache TTL, pagination style, every parameter, and the constraints the API validates before billing
+3. Resolve API key
+4. Read [references/cost-gate.md](references/cost-gate.md), construct the exact request shape, and show its preflight cost gate before every paid call. A heading's number may be a per-row or per-page unit, not the request total
+5. Prefer the cheapest endpoint that fully answers the question. Do not fetch extra pages, enrichment legs, transcripts, replies, engines, countries, or rows the user did not request
+6. If the user already asked to execute this exact paid request, the cost disclosure is enough and you may continue. Ask for confirmation only when you propose a paid call or wider scope that they did not already authorise
+7. Construct and execute the request shown in the reference, preserving its HTTP method and body shape
+8. Return the requested data, then report `credits_used` and `credits_remaining` from the response. For an async job, report the hold at submission and the settled charge when the job completes
+
+**User wants code:**
+1. Identify platform, resource, and target language
+2. Read the platform's reference file and [references/cost-gate.md](references/cost-gate.md)
+3. Generate a working code snippet using the `SOCIALCRAWL_API_KEY` environment variable for the key, plus a comment that states the request's billing unit or formula
+4. Present the code without executing and never include a literal credential
+
+**User asks about capabilities:**
+1. Answer from the platform table above
+2. If they need details about auth, response format, unified schemas, pagination, caching, idempotency, or errors, read [references/api-overview.md](references/api-overview.md)
+
+**User asks what the API supports right now (or this skill looks out of date):**
+1. The free `/v1/utility/*` endpoints answer from the live registry at 0 credits — they are always safe to call
+2. `GET /v1/utility/endpoints` lists every live endpoint (filter with `?platform=` or `?search=`); `GET /v1/utility/endpoint?id=tiktok/profile` explains one; `GET /v1/utility/quickstart` returns a ready-to-run first call
+3. Prefer the live answer over this file when the two disagree — the registry is the source of truth
+
+**User wants to compare products across retailers:**
+1. Amazon, Walmart, Target, eBay, and Home Depot share the canonical Product / Review / Seller schemas, so rows line up field-for-field across all five
+2. Read each retailer's reference file, resolve the product id each one needs (ASIN, item id, TCIN, …) via its own search endpoint, then fetch detail/reviews per retailer
+3. Or use `/v1/prism/product-reviews` to fan out across retailers in one composite call
+
+**User wants a cross-platform composite (one call, many platforms):**
+1. Read [references/prism.md](references/prism.md) to pick the right `/v1/prism/*` recipe (or a `{platform}/profile/full` / `reddit/omni-search` per-platform composite)
+2. Read [references/cost-gate.md](references/cost-gate.md) and calculate the request-level cost. Some batch composites can reserve hundreds of credits even when the endpoint's unit price is 1 or 2
+3. Resolve API key, call the endpoint, return the unified payload (note the `legs[]` transparency array)
+
+**User wants to schedule/monitor a recipe over time:**
+1. Read [references/monitors.md](references/monitors.md)
+2. `POST /v1/monitors` with a `recipe`, `cadence`, and `webhook_url`; manage via list/get/runs/timeseries/pause/resume/delete
+3. Managing monitors is free; each scheduled run bills the recipe's normal cost + a 1-credit scheduling premium
+
+**User wants to know which of THEIR OWN list of accounts talked about something:**
+This is Cohorts, not social listening. The tell is that the user already has the list — a purchaser panel, a customer roster, a creator shortlist — and wants those accounts' public posts, not the open firehose. If they want to *discover* who is talking, use `prism/brand-mentions`, `search/creators`, or `content_analysis` instead.
+1. Read [references/cohorts.md](references/cohorts.md)
+2. `POST /v1/cohorts`, then `PUT /v1/cohorts/{id}/members` in chunks of 1,000 (10,000 max per cohort). Only the 10 identity platforms listed there are accepted; both writes need an `Idempotency-Key` UUID
+3. **Compute the ceiling before submitting** — `SUM(member x page cap x credits per page)`, at 5/page for LinkedIn, 2/page-round for Instagram and YouTube, 1 elsewhere, and a fixed 1 page for X, Bluesky, Threads and Twitch. `max_credits` must clear it or submission 400s before any credit is held
+4. `POST /v1/cohorts/{id}/queries` returns `202`; poll `GET /v1/cohort-queries/{queryId}`, then page `.../results` with `cursor`
+5. Report `coverage` alongside `items`. A member with `window_complete: false` or `status: not_found` means the answer is not exhaustive — saying "no mentions" without checking coverage is the failure mode this surface exists to prevent
+
+**User asks about pricing or credit costs:**
+1. Read [references/cost-gate.md](references/cost-gate.md) first for request-level estimation rules
+2. Read [references/pricing.md](references/pricing.md) for the endpoint inventory, tiers, packs, cache TTLs, refunds, and the full metered/custom table
+3. Distinguish a unit price from a request total. Include the submitted row/page/probe/run count in the arithmetic
+4. Its **Free endpoints** table lists everything that never bills
+
+**User asks about credits/balance:**
+1. Resolve API key
+2. Run: `curl -s -H "x-api-key: $SOCIALCRAWL_API_KEY" "https://www.socialcrawl.dev/v1/credits/balance"` (0 credits)
+3. Return the balance
+4. For a line-by-line credit ledger (deductions/refunds, newest first, cursor-paginated), use `curl -s -H "x-api-key: $SOCIALCRAWL_API_KEY" "https://www.socialcrawl.dev/v1/credits/transactions?limit=50"` (0 credits)
+
+**Ambiguous platform:** If the user says "get profile for @nike" without specifying a platform, ask which platform they mean.
+
+**Multi-platform requests:** Load each platform's reference file and make sequential calls — or suggest `/v1/search/everywhere` (20 credits) when the user wants one query across many platforms at once. For multi-country news coverage suggest `/v1/search/news` (metered 2-62 credits: it plans and localizes the query, then searches up to 12 Google News country editions in one call).
+
+## Making API Calls
+
+Base URL: `https://www.socialcrawl.dev`
+
+Most endpoints are GET with query parameters:
+
+```
+curl -s -H "x-api-key: $SOCIALCRAWL_API_KEY" \
+  "https://www.socialcrawl.dev/v1/{platform}/{resource}?{param}={value}"
+```
+
+URL-encode parameter values that contain spaces or special characters.
+
+**Not everything is a GET.** Never assume the method — every endpoint section in a platform reference is headed by its real verb and carries a runnable curl for it. The non-GET routes are:
+
+- **Batch reads** (`POST /v1/youtube/videos`, `/v1/youtube/channels`, `/v1/youtube/transcripts`, `/v1/prism/post-stats`, `/v1/prism/profiles`, `/v1/prism/comment-lookup`) — the id/URL list is too large for a query string, so it travels in a JSON body as a real array.
+- **Web jobs, monitors, and sessions** (`/v1/web/*`) — POST to submit or create, GET to poll or list, PATCH to update, DELETE to cancel or close.
+- **Monitors** (`/v1/monitors/*`) — see [references/monitors.md](references/monitors.md).
+- **Cohorts** (`/v1/cohorts/*`, `/v1/cohort-queries/*`) — POST to create a cohort or submit a query, **PUT** to upload members (the only PUT in the API), GET to poll and read results, DELETE to cancel or purge. POST and PUT require an `Idempotency-Key` UUID header. See [references/cohorts.md](references/cohorts.md).
+- **`POST /v1/web/parse`** is `multipart/form-data`, not JSON.
+
+A POST/PATCH call needs both headers:
+
+```
+curl -X POST "https://www.socialcrawl.dev/v1/youtube/transcripts" \
+  -H "x-api-key: $SOCIALCRAWL_API_KEY" \
+  -H "content-type: application/json" \
+  -d '{"ids":["dQw4w9WgXcQ","9bZkp7q19f0"]}'
+```
+
+**Rate limits:** 600 requests per minute and 50 concurrent requests per key. Both return 429 with a `Retry-After`; a rate-limited call is never billed.
+
+**Streaming:** a few endpoints (`/v1/search/everywhere`, `/v1/search/news`, `/v1/prism/comments`, `/v1/prism/answers`, `/v1/prism/profiles`, `/v1/prism/app-reviews`, `/v1/reddit/omni-search`, `/v1/youtube/transcripts`) emit Server-Sent Events when you send `Accept: text/event-stream`. Omit that header to get one JSON body instead — each endpoint's reference section says which behaviour it has.
+
+**Latency note:** some endpoints are task-polled upstream — Google Shopping, Trustpilot, Tripadvisor, Google Business, Google Play, App Store, Google Trends, Finance, Content Analysis, Pinterest, and Amazon `product`. Expect ~10–45s responses; use a 60s timeout for those. Web crawl / batch-scrape / agent jobs are async by design: they return a `job_id` immediately and you poll `GET /v1/web/jobs/{job_id}`.
+
+**Two-step endpoints:** some resources need an id from an earlier call — Google Shopping `product`/`reviews`/`sellers` need ids from `product-search`; Tripadvisor `reviews` needs `url_path` from `search`; Google `hotels/info` needs `hotel_identifier` from `hotels/search`; every `linkedin/company/*` sub-resource needs `company_id` from `linkedin/company`; `facebook/post/comment/replies` needs `feedback_id` + `expansion_token` from `facebook/post/comments`; Target `product`/`reviews` need a TCIN; `content_analysis/category-trends` needs a `category_code` from `content_analysis/categories`. Every endpoint's parameter descriptions name its prerequisite.
+
+## Row Hydration (`include=`)
+
+Many list endpoints return rows the upstream surface does not fully populate — a Pinterest search row carries no save count, a TikTok user-search row no bio or region, a YouTube playlist row no view count, a LinkedIn people row no exact follower count. Those leaves are `null` on a plain call.
+
+**`include=` fills them in the same call.** It is an opt-in, CSV, enum-typed query param: each row is joined to a sibling endpoint on the same platform and only the leaves the row lacks are copied onto it. Nothing already on the row changes. A typo is a free pre-billing 400.
+
+28 lanes across 8 platforms offer one. The tokens are `profile`, `engagement`, `details`, `channel`, `ad`, and `saves`; which one a lane accepts is in its endpoint section, along with exactly which leaves it fills.
+
+**How it is priced — read this before sending one.** The join is charged per row, on top of the page:
+
+- An **upfront ceiling** is held: `base + (credits per row x rows joinable)`.
+- It is **refunded down to rows actually filled**. A row the sibling could not fill is refunded; a row served from the sibling's own cache is **free**.
+- `credits_used` on the response is the real charge. A `data.hydration` block itemises rows looked up, filled, cache hits, credits held and kept, and milliseconds.
+
+So `GET /v1/pinterest/search` is 1 credit plain and **up to 26** with `include=engagement`; `GET /v1/linkedin/search/people` is 10 plain and **up to 50** with `include=profile` (4 credits a row). Never quote the plain heading cost for a hydrated call.
+
+**Four traps worth knowing:**
+
+- **`limit` caps rows and credits together** on the lanes that offer it — `limit=5` on Pinterest search holds `1 + 5`, not `1 + 25`. Use it to bound spend.
+- **`instagram/similar` defaults to its top 20 rows** when you send `include=profile` without `limit` (a hold of 25, not 85). `limit=80` buys the full roster at up to 85 credits.
+- **On `threads/user/posts` and `threads/search`, `limit` is _not_ a row cap** — it switches the source or sets the walker's target. Those two hold their full window (15 and 20) regardless.
+- **YouTube joins are batch-priced**: 1 credit per distinct id but never more than 5 per 50 ids, so a 50-row page adds 5, not 50. On a channel-scoped list (`channel/videos`, `channel/shorts`) the join is a single shared lookup: 1 credit.
+
+Latency: a hydrated page adds roughly 3–10 seconds on a fresh call (lookups run in parallel, bounded per row) and nothing when the rows are already cached.
+
+The per-lane ceilings for all 28 lanes are tabulated in [references/cost-gate.md](references/cost-gate.md#row-hydration-include). Always confirm against the endpoint's own **Pricing** line in its platform reference.
+
+## Credit Tiers
+
+<!-- BEGIN:GENERATED:CREDIT_TIERS (auto-generated by generate-docs.ts - AIP-16b) -->
+| Tier | Cost | Endpoints | Typical endpoints |
+|------|------|-----------|-------------------|
+| standard | 1 credit | 258 | Profiles, posts, search, comments, reference data |
+| advanced | 5 credits | 166 | Ad libraries, trending, audience analytics, app/product/place reviews, retail catalogs, Google + Naver trends, LinkedIn social graph + jobs, Instagram relationship/discovery data |
+| premium | 10 credits | 19 | Video transcripts, LinkedIn people/job search + reactions, app-listings search, web agent jobs |
+| custom (flat / metered) | varies (0-10000) | 132 | `/v1/search/everywhere` (20), `search/forums` (10) & `search/news` (2-62 metered); `naver/brief` (10); `{platform}/profile/full` (5); the free `/v1/utility/*` self-discovery endpoints (0); web scrape/crawl/sessions; all `/v1/prism/*` composites (0-1605, flat or metered per recipe) |
+<!-- END:GENERATED:CREDIT_TIERS -->
+
+Cache hits, idempotent replays, every `/v1/utility/*` endpoint, and `/v1/credits/balance` cost 0 credits. Failed calls (upstream errors, circuit-breaker rejections, request timeouts, not-found resources, empty results) are auto-refunded, and a request rejected for bad params or a rate limit never deducts at all. Metered endpoints deduct an upfront ceiling and refund down to the actual work done, so the response `credits_used` is the real charge.
+
+Before every paid call, run the preflight in [references/cost-gate.md](references/cost-gate.md). Quote the total for the exact request, not only the endpoint's base or unit cost. After every call, report `credits_used` and `credits_remaining` from the response.
+
+**If the task needs a whole list, price the whole walk before the first page.** Paging to completion multiplies the page cost by the page count, and the endpoint heading only ever shows one page. `coverage=full` on `instagram/followers` and `instagram/following` is the extreme case: 10 credits a page, about 50 accounts a page, so a 2,600-account list is roughly 540 credits and several minutes. Quote that total and get the user's agreement before starting. See [Multi-page walks](references/cost-gate.md#multi-page-walks-coveragefull).
+
+Full per-endpoint pricing — cost, tier, cache TTL, the rule behind every metered endpoint, the free-endpoint list, and how to estimate a large job before running it — is in [references/pricing.md](references/pricing.md).
+
+## Error Handling
+
+Classify an error before retrying:
+
+- **Fix before retrying:** `MISSING_API_KEY`, `INVALID_API_KEY`, `INSUFFICIENT_CREDITS`, `KEY_BUDGET_EXCEEDED`, `INVALID_REQUEST`, `METHOD_NOT_ALLOWED`, `ENDPOINT_NOT_FOUND`, `PAYLOAD_TOO_LARGE`, and idempotency conflicts. Explain the corrective action and do not automatically repeat the same request.
+- **Wait before retrying:** `RATE_LIMITED`, `CONCURRENCY_LIMIT`, and `SERVICE_UNAVAILABLE`. Honour `Retry-After`, then use exponential backoff with jitter.
+- **Transient upstream failure:** `UPSTREAM_ERROR` and `INTERNAL_ERROR`. Retry at most once, then report the outage with the endpoint and request ID, never the credential.
+- **Not found:** `RESOURCE_NOT_FOUND` is a valid empty outcome, not a retry loop.
+
+For a retryable paid non-streaming request, send an `Idempotency-Key` before the first attempt and reuse it only for the identical payload. Do not automatically retry streaming requests. Never exceed one automatic retry unless the user explicitly asks for continued retries.
+
+<!-- BEGIN:GENERATED:ERRORS (auto-generated by generate-docs.ts - AIP-16b) -->
+| Code | Status | Retry? | What it means / what to do |
+|------|--------|--------|----------------------------|
+| MISSING_API_KEY | 401 | no | No x-api-key header on the request. Ask the user for their key and save it to `~/.config/socialcrawl/api_key` |
+| INVALID_API_KEY | 401 | no | API key is malformed, not found, revoked, or expired. Tell the user to check the key at https://socialcrawl.dev/dashboard |
+| INSUFFICIENT_CREDITS | 402 | no | Credit balance is lower than the endpoint cost. Point the user at https://socialcrawl.dev/dashboard/billing |
+| INVALID_REQUEST | 400 | no | A required parameter is missing, a value failed validation, or no one-of group member was provided. Re-read the endpoint's params and Constraints in its platform reference before retrying - this is free, so a retry costs nothing |
+| ENDPOINT_NOT_FOUND | 404 | no | The platform or resource is not supported. Check the platform table, or call the free `GET /v1/utility/endpoints` to list the live surface |
+| RESOURCE_NOT_FOUND | 404 | no | The requested item was not found on the platform; credits are refunded when triggered by an empty upstream result |
+| CONCURRENCY_LIMIT | 429 | yes | More than 50 simultaneous requests on the same API key; honor Retry-After, then back off. Wait for the `Retry-After` value, then retry |
+| UPSTREAM_ERROR | 502 | yes | The platform returned an error; credits are automatically refunded. Retry once, then report it as a platform-side outage |
+| SERVICE_UNAVAILABLE | 503 | yes | Temporarily unavailable for this platform, either after repeated failures or because the upstream provider is rate-limiting us; honor Retry-After, credits are refunded. Retry after ~30s |
+| INTERNAL_ERROR | 500 | yes | Unexpected server error; credits are automatically refunded |
+| METHOD_NOT_ALLOWED | 405 | no | Wrong HTTP method for this endpoint. Check the method in the platform reference - the `/v1/web/*` job, monitor, and session routes and the batch endpoints are POST/PATCH/DELETE, not GET |
+| IDEMPOTENCY_KEY_CONFLICT | 409 | no | The Idempotency-Key conflicts with an incompatible active reservation. Use a fresh Idempotency-Key |
+| IDEMPOTENCY_IN_PROGRESS | 409 | yes | A request with this Idempotency-Key is still running; retry after the Retry-After delay. Unbilled - wait for Retry-After, then retry with the same Idempotency-Key |
+| IDEMPOTENCY_REPLAY_UNAVAILABLE | 409 | no | The original outcome is known, but its response body exceeded the idempotent replay storage limit; use a new key only to make a new billable request. The prior call already completed; use a new key only to make a new billable request |
+| IDEMPOTENCY_KEY_PAYLOAD_MISMATCH | 422 | no | The Idempotency-Key was reused with a different request payload. Use a fresh Idempotency-Key for the changed payload |
+| COHORT_MEMBER_LIMIT_EXCEEDED | 400 | no | The cohort member limit would be exceeded by this upload |
+| COHORT_LIMIT_EXCEEDED | 400 | no | The account already holds the maximum number of cohorts |
+| COHORT_IDENTITY_PLATFORM_UNSUPPORTED | 400 | no | The identity platform is not supported for cohort queries |
+| COHORT_IDENTITY_CONFLICT | 409 | no | The normalized identity is already assigned to another external ID |
+| COHORT_QUERY_NOT_CANCELLABLE | 409 | no | The cohort query is terminal and cannot be cancelled |
+| COHORT_QUERY_NOT_READY | 409 | no | The cohort query has not completed and its results are not available |
+| COHORT_RESULT_TOO_LARGE | 413 | no | One cohort query result exceeds the maximum response-page size |
+| PAYLOAD_TOO_LARGE | 413 | no | The JSON request body exceeds the 1 MB size limit |
+| RATE_LIMITED | 429 | yes | More than 600 requests in a 1-minute window on the same API key; honor Retry-After, then back off. Unbilled - wait for `Retry-After`, then retry |
+| KEY_BUDGET_EXCEEDED | 402 | no | This API key has spent its per-key credit limit; the account balance is unaffected. Raise or reset the key's limit in Dashboard → API Keys, or use a key with no limit |
+<!-- END:GENERATED:ERRORS -->
+
+## References
+
+- **[references/api-overview.md](references/api-overview.md)** — Read when user asks about authentication, response envelope, unified schemas (Author/Post/Comment/Product/Review/Seller/Place/App), computed fields, pagination, caching, idempotency, `?format=raw`, concurrency, or error details
+- **[references/cost-gate.md](references/cost-gate.md)** — Read before every paid call and whenever estimating a job. It turns row, URL, probe, page, chunk, runtime, and recurring-run units into the total for the exact request, and a paged walk into the total for the whole walk
+- **[references/pricing.md](references/pricing.md)** — Read when user asks about pricing, credit costs, tiers, credit packs, refunds, or what a job will cost; has the exact cost, tier, and cache TTL of all 575 endpoints, the full rule and honest range for every metered endpoint, and the free-endpoint list
+- **[references/prism.md](references/prism.md)** — Read when user wants a cross-platform composite (`/v1/prism/*`) — one call that fans out across many platforms
+- **[references/monitors.md](references/monitors.md)** — Read when user wants to schedule a recipe to re-run on a cadence with webhook delivery (`/v1/monitors/*`)
+- **[references/cohorts.md](references/cohorts.md)** — Read when user supplies their own list of public accounts and wants to know which of *them* posted about a keyword (`/v1/cohorts/*`), including the panel limits, the computed credit ceiling, and the coverage contract
+- **[references/{platform}.md](references/)** — Read the specific platform file when user asks about or wants to call that platform's endpoints. Every endpoint section there carries its HTTP method, exact credit cost, cache TTL, response archetype, pagination style, every parameter with its type / enum values / bounds / example, the pre-billing constraints (one-of groups, param dependencies, CSV limits), and a runnable curl
