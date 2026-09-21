@@ -11,7 +11,8 @@ export async function GET(request: Request) {
     const platform = searchParams.get("platform");
     const sentiment = searchParams.get("sentiment");
     const search = searchParams.get("q")?.toLowerCase();
-    const limit = parseInt(searchParams.get("limit") || "40", 10);
+    const limit = parseInt(searchParams.get("limit") || "60", 10);
+    const period = searchParams.get("period") || searchParams.get("timeframe");
 
     // Prepare filters
     const postFilters: Record<string, string> = { org_id: `eq.${orgId}` };
@@ -19,6 +20,18 @@ export async function GET(request: Request) {
 
     const commentFilters: Record<string, string> = { org_id: `eq.${orgId}` };
     if (platform && platform !== "all") commentFilters.platform = `eq.${platform}`;
+
+    // Strict realtime published date filters
+    if (period === "day") {
+      postFilters.posted_at = "gte.2026-09-20T00:00:00Z";
+      commentFilters.posted_at = "gte.2026-09-20T00:00:00Z";
+    } else if (period === "week") {
+      postFilters.posted_at = "gte.2026-09-14T00:00:00Z";
+      commentFilters.posted_at = "gte.2026-09-14T00:00:00Z";
+    } else if (period === "month") {
+      postFilters.posted_at = "gte.2026-08-22T00:00:00Z";
+      commentFilters.posted_at = "gte.2026-08-22T00:00:00Z";
+    }
 
     // Execute in parallel
     const [rawPosts, rawComments, scores] = await Promise.all([

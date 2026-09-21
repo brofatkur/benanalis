@@ -28,9 +28,11 @@ import {
   XCircle,
   Database,
   ImageIcon,
-  Play
+  Play,
+  LayoutDashboard
 } from "lucide-react";
 import ExecutiveReportModal from "@/components/ExecutiveReportModal";
+import MediaIntelligenceView from "@/components/MediaIntelligenceView";
 import {
   ResponsiveContainer,
   AreaChart,
@@ -59,7 +61,7 @@ const COLORS = {
 };
 
 export default function MediaAnalitikDashboard() {
-  const [activeTab, setActiveTab] = useState<"overview" | "topics" | "feed" | "profile" | "integrations">("overview");
+  const [activeTab, setActiveTab] = useState<"intelligence" | "overview" | "topics" | "feed" | "profile" | "integrations">("intelligence");
   const [overviewData, setOverviewData] = useState<any>(null);
   const [topicsData, setTopicsData] = useState<any[]>([]);
   const [feedData, setFeedData] = useState<any[]>([]);
@@ -472,6 +474,7 @@ export default function MediaAnalitikDashboard() {
         {/* Navigation Tabs */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-1 border-t border-slate-800/80 overflow-x-auto">
           {[
+            { id: "intelligence", label: "Media Intelligence Hub", icon: LayoutDashboard },
             { id: "overview", label: "Ringkasan Eksekutif", icon: BarChart3 },
             { id: "topics", label: "Analisis Topik & Isu", icon: Layers },
             { id: "feed", label: "Social Stream & Komentar", icon: MessageSquare },
@@ -500,6 +503,16 @@ export default function MediaAnalitikDashboard() {
 
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* ======================= TAB 0: MEDIA INTELLIGENCE HUB ======================= */}
+        {activeTab === "intelligence" && (
+          <MediaIntelligenceView
+            overviewData={overviewData}
+            feedData={feedData}
+            onRefresh={fetchData}
+            refreshing={loading}
+          />
+        )}
+
         {/* ======================= TAB 1: OVERVIEW ======================= */}
         {activeTab === "overview" && (
           <div className="space-y-6">
